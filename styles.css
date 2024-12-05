@@ -303,9 +303,8 @@ button,
 /* Media Queries para Responsividade */
 
 /* Para dispositivos pequenos (como smartphones) */
-@media (max-width: 600px) {
-    header h1 {
-        font-size: 1.8rem; /* Reduz o tamanho do título para dispositivos menores */
+@media (max-width: 600px)
+    {
     }
 
     /* Media Queries para Responsividade */
