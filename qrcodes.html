@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Codes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>QR Codes - Paredes das Salas</h1>
+
+        <div class="qr-codes">
+            <div class="qr-code" id="qr1">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://techvida.netlify.app/?progress=20&size=150x150" alt="QR Code Sala 1">
+            </div>
+            <div class="qr-code" id="qr2">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://techvida.netlify.app/?progress=40&size=150x150" alt="QR Code Sala 2">
+            </div>
+            <div class="qr-code" id="qr3">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://techvida.netlify.app/?progress=60&size=150x150" alt="QR Code Sala 3">
+            </div>
+            <div class="qr-code" id="qr4">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://techvida.netlify.app/?progress=80&size=150x150" alt="QR Code Sala 4">
+            </div>
+            <div class="qr-code" id="qr5">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://techvida.netlify.app/?progress=100&size=150x150" alt="QR Code Sala 5">
+            </div>
+        </div>
+
+        <button id="backBtn" class="qrcodes-back-btn">Voltar</button>
+    </div>
+
+    <script>
+        // Função para simular o clique do QR Code
+        function handleQRCodeScan(buttonId) {
+            if (!localStorage.getItem(buttonId)) {
+                // Aqui você pode chamar a função handleButtonClick do script principal
+                handleButtonClick(buttonId); 
+            }
+        }
+
+        // Função para voltar à página inicial
+        document.getElementById('backBtn').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
