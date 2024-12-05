@@ -245,8 +245,6 @@ button:focus, input[type="file"]:focus {
 .upload-btn:hover {
     background-color: #007bb5;
 }
-}
-
 /* Estilo para logs de QR code */
 #log {
     font-size: 1rem;
@@ -310,11 +308,13 @@ button,
         font-size: 1.8rem; /* Reduz o tamanho do título para dispositivos menores */
     }
 
-    .logo {
-        width: 60px; /* Reduz o tamanho da logo */
-        top: 10px;
-        right: 10px;
-    }
+    /* Media Queries para Responsividade */
+    
+    /* Para dispositivos pequenos (como smartphones) */
+    @media (max-width: 600px) {
+        header h1 {
+            font-size: 1.8rem; /* Reduz o tamanho do título para dispositivos menores */
+        }
 
     #progress-bar-container {
         width: 90%; /* Barra de progresso ocupa mais espaço */
@@ -352,7 +352,9 @@ button,
     }
 
     .logo {
-        width: 70px;
+        width: 70px; /* Ajuste para tablets */
+        top: 15px;   /* Distância do topo */
+        right: 15px; /* Distância da borda direita */
     }
 
     button, input[type="file"] {
