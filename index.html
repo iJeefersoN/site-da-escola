@@ -7,37 +7,237 @@
     <h3>Leia todos os QRCodes para ganhar o brinde!</h3>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="container">
+<div class="container">
+    <header>
+        <!-- Logo no canto superior direito -->
+        <img src="logo.png" alt="Logo" class="logo">
+    </header>
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+          /* Reset de margens e padding */
+          * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+         }
+    
+            /* Corpo da página */
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f7f7f7;
+                color: #333;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                flex-direction: column;
+            }
+    
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #333;
+            }
+    
+            /* Estilos para a barra de progresso */
+            #progress-bar-container {
+                width: 80%;
+                max-width: 600px;
+                background-color: #e0e0e0;
+                border-radius: 15px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                margin: 20px 0;
+            }
+    
+            #progress-bar {
+                height: 30px;
+                width: 0;
+                background-color: #0096ed;
+                border-radius: 15px;
+                text-align: center;
+                line-height: 30px;
+                color: white;
+                font-weight: bold;
+            }
+    
+            /* Estilos para os botões */
+            button, input[type="file"] {
+                background-color: #0096ed;
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                margin: 10px;
+                font-size: 1rem;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+    
+            button:hover, input[type="file"]:hover {
+                background-color: #0096ed;
+            }
+    
+            button:focus, input[type="file"]:focus {
+                outline: none;
+            }
+    
+            /* Estilos para mensagens ou logs */
+            #log {
+                margin-top: 20px;
+                font-size: 1rem;
+                color: #555;
+            }
+    
+            /* Estilo para o botão de redirecionamento */
+            #redirect-button {
+                display: none; /* Esconde o botão inicialmente */
+                background-color: #008CBA;
+                padding: 15px 32px;
+                font-size: 1.2rem;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+    
+            #redirect-button:hover {
+                background-color: #007bb5;
+            }
+        </style>
+    </head>
+    <body>
+    
         <h1>Feira Tech & Vida</h1>
-        <div class="progress-container">
-            <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="105"></div>
+        
+        <!-- Barra de progresso -->
+        <div id="progress-bar-container">
+            <div id="progress-bar">0%</div>
         </div>
         
-        <div class="buttons">
-            <button id="button1" class="progress-btn">Sala 1</button>
-            <button id="button2" class="progress-btn">Sala 2</button>
-            <button id="button3" class="progress-btn">Sala 3</button>
-            <button id="button4" class="progress-btn">Sala 4</button>
-            <button id="button5" class="progress-btn">Sala 5</button>
-            <button id="button6" class="progress-btn">Sala 6</button>
-            <button id="button7" class="progress-btn">Sala 7</button>
-        </div>
-
-
+        <br>
     
-
-        <div class="reset-container">
-            <button id="resetBtn" class="reset-btn">Resetar Progresso</button>
-            <button id="qrcodesBtn" class="qrcodes-back-btn">QR Codes</button>
-
+        <!-- Botão para iniciar a câmera -->
+        <button onclick="startCamera()">Iniciar Câmera</button>
+        <!-- Campo para upload de imagem -->
+        <input type="file" accept="image/*" id="upload" onchange="readQRCodeFromFile(event)">
+    
+        <div id="qr-code-area">
+            <video id="video" width="320" height="240" autoplay></video>
         </div>
+    
+        <div id="log"></div>
+    
+        <!-- Botão de redirecionamento que será mostrado ao completar a barra de progresso -->
+        <button id="redirect-button" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSfkABb7ihtrT19LHMEqOy4vVXWpfGF7Fd2w-gmBxqKadJvHQA/viewform'">Ir para o Site</button>
+    
+        <script src="https://cdn.jsdelivr.net/npm/jsqr"></script> <!-- Biblioteca para ler QR code -->
+        <script>
+            let video = document.getElementById("video");
+            let progressBar = document.getElementById("progress-bar");
+            let progress = 0;
+            let redirectButton = document.getElementById("redirect-button");
+    
+            // Função para iniciar a câmera
+            function startCamera() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(function(stream) {
+                            video.srcObject = stream;
+                            detectQRCode();
+                        })
+                        .catch(function(err) {
+                            console.log("Erro ao acessar a câmera: " + err);
+                        });
+                } else {
+                    alert("Câmera não disponível no seu dispositivo.");
+                }
+            }
+    
+            // Função para detectar e processar o QR code na imagem da câmera
+            function detectQRCode() {
+                let canvas = document.createElement("canvas");
+                let context = canvas.getContext("2d");
+    
+                setInterval(function() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvas.height = video.videoHeight;
+                        canvas.width = video.videoWidth;
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+                        // Captura a imagem da câmera e tenta decodificar o QR code
+                        let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        let decoded = jsQR(imageData.data, canvas.width, canvas.height);
+    
+                        if (decoded) {
+                            // Se QR Code for lido, aumente a barra de progresso
+                            increaseProgress();
+    
+                            // Exibe o conteúdo do QR code (opcional)
+                            logMessage(decoded.data);
+                        }
+                    }
+                }, 100); // A cada 100ms, verifica se há QR code
+            }
+    
+            // Função para aumentar a barra de progresso
+            function increaseProgress() {
+                if (progress < 105) {
+                    progress += 15; // Aumenta 15% a cada QR code lido
+                    progressBar.style.width = progress + "%";
+                    progressBar.innerText = progress + "%";
+                }
+                if (progress === 105) {
+                    showRedirectButton();
+                }
+            }
+    
+            // Função para mostrar o botão de redirecionamento
+            function showRedirectButton() {
+                redirectButton.style.display = 'inline-block'; // Torna o botão visível
+            }
+    
+            // Função para ler QR code a partir de um arquivo de imagem
+            function readQRCodeFromFile(event) {
+                let file = event.target.files[0];
+                let reader = new FileReader();
+    
+                reader.onload = function(e) {
+                    let img = new Image();
+                    img.onload = function() {
+                        let canvas = document.createElement("canvas");
+                        let context = canvas.getContext("2d");
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        context.drawImage(img, 0, 0, img.width, img.height);
+    
+                        let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        let decoded = jsQR(imageData.data, canvas.width, canvas.height);
+    
+                        if (decoded) {
+                            // Se QR Code for lido, aumente a barra de progresso
+                            increaseProgress();
+    
+                            // Exibe o conteúdo do QR code (opcional)
+                            logMessage(decoded.data);
+                        } else {
+                            alert("QR Code não encontrado na imagem.");
+                        }
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+    
+            // Função para logar a mensagem do QR Code lido
+            function logMessage(message) {
+                let log = document.getElementById("log");
+                log.innerText = "QR Code lido: " + message;
+            }
+        </script>
+    </body>
 
-        <div class="voting-container">
-            <button id="votingBtn" class="voting-btn" disabled>Avalie os Projetos</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
 </html>
