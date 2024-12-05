@@ -245,22 +245,6 @@ button:focus, input[type="file"]:focus {
 .upload-btn:hover {
     background-color: #007bb5;
 }
-
-/* Estilo para o vídeo */
-#qr-code-area {
-    width: 100%;
-    max-width: 600px;
-    margin-top: 20px;
-    background-color: white;
-    padding: 10px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
-
-#video {
-    border-radius: 10px;
-    max-width: 100%;
-    height: auto;
 }
 
 /* Estilo para logs de QR code */
