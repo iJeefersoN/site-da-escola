@@ -9,18 +9,20 @@ function startCamera() {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
-    // Acesse a câmera
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => {
-            video.srcObject = stream;
-            video.setAttribute('playsinline', true); // Para que funcione no iPhone
-            video.play();
-            requestAnimationFrame(scanQRCode); // Inicia o processo de leitura do QR code
-        })
-        .catch(err => {
-            console.error("Erro ao acessar a câmera: ", err);
-            document.getElementById('log').textContent = "Erro ao acessar a câmera.";
-        });
+    // Acesse a câmera traseira
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } }  // Garante o uso da câmera traseira
+    })
+    .then(stream => {
+        video.srcObject = stream;
+        video.setAttribute('playsinline', true); // Para que funcione no iPhone
+        video.play();
+        requestAnimationFrame(scanQRCode); // Inicia o processo de leitura do QR code
+    })
+    .catch(err => {
+        console.error("Erro ao acessar a câmera: ", err);
+        document.getElementById('log').textContent = "Erro ao acessar a câmera.";
+    });
 }
 
 // Função para escanear o QR code a cada quadro
