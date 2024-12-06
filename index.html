@@ -22,131 +22,185 @@
     
         <h1>Feira Tech & Vida</h1>
         
-        <!-- Barra de progresso -->
-        <div id="progress-bar-container">
-            <div id="progress-bar">0%</div>
-        </div>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Escaneamento de QR Code com Barra de Progresso</title>
+            <style>
+                /* Estilo básico para centralizar o conteúdo */
+                body {
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+                    height: 100vh;
+                    margin: 0;
+                    background-color: #f0f0f0;
+                }
         
-        <br>
-    
-        <!-- Botão para iniciar a câmera -->
-        <button onclick="startCamera()">Iniciar Câmera</button>
-        <!-- Campo para upload de imagem -->
-        <input type="file" accept="image/*" id="upload" onchange="readQRCodeFromFile(event)">
-    
-        <div id="qr-code-area">
-            <video id="video" width="320" height="240" autoplay></video>
-        </div>
-    
-        <div id="log"></div>
-    
-        <!-- Botão de redirecionamento que será mostrado ao completar a barra de progresso -->
-        <button id="redirect-button" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSfkABb7ihtrT19LHMEqOy4vVXWpfGF7Fd2w-gmBxqKadJvHQA/viewform'">Ir para o Site</button>
-    
-        <script src="https://cdn.jsdelivr.net/npm/jsqr"></script> <!-- Biblioteca para ler QR code -->
-        <script>
-            let video = document.getElementById("video");
-            let progressBar = document.getElementById("progress-bar");
-            let progress = 0;
-            let redirectButton = document.getElementById("redirect-button");
-    
-            // Função para iniciar a câmera
-            function startCamera() {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then(function(stream) {
-                            video.srcObject = stream;
-                            detectQRCode();
-                        })
-                        .catch(function(err) {
-                            console.log("Erro ao acessar a câmera: " + err);
-                        });
-                } else {
-                    alert("Câmera não disponível no seu dispositivo.");
+                #video {
+                    width: 100%;
+                    max-width: 500px;
+                    border: 2px solid #000;
                 }
-            }
-    
-            // Função para detectar e processar o QR code na imagem da câmera
-            function detectQRCode() {
-                let canvas = document.createElement("canvas");
-                let context = canvas.getContext("2d");
-    
-                setInterval(function() {
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        canvas.height = video.videoHeight;
-                        canvas.width = video.videoWidth;
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-                        // Captura a imagem da câmera e tenta decodificar o QR code
-                        let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        let decoded = jsQR(imageData.data, canvas.width, canvas.height);
-    
-                        if (decoded) {
-                            // Se QR Code for lido, aumente a barra de progresso
-                            increaseProgress();
-    
-                            // Exibe o conteúdo do QR code (opcional)
-                            logMessage(decoded.data);
-                        }
+        
+                #log {
+                    margin-top: 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+        
+                #redirect-button {
+                    display: none;
+                    margin-top: 20px;
+                    padding: 10px 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
+        
+                #redirect-button:hover {
+                    background-color: #45a049;
+                }
+        
+                /* Estilos para a barra de progresso */
+                #progress-bar-container {
+                    width: 100%;
+                    max-width: 500px;
+                    background-color: #ddd;
+                    height: 20px;
+                    margin-top: 20px;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+        
+                #progress-bar {
+                    width: 0;
+                    height: 100%;
+                    background-color: #4CAF50;
+                    text-align: center;
+                    line-height: 20px;
+                    color: white;
+                    font-weight: bold;
+                }
+            </style>
+        </head>
+        <body>
+        
+            <div>
+                <video id="video" autoplay playsinline></video>
+                <div id="log">Escaneie o QR Code...</div>
+                <button id="redirect-button" onclick="window.location.href='https://example.com';">Ir para o link</button>
+                <!-- Barra de progresso -->
+                <div id="progress-bar-container">
+                    <div id="progress-bar">0%</div>
+                </div>
+            </div>
+        
+            <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+            <script>
+                let scanning = false;  // Variável para verificar se o QR code foi lido
+                let progress = 0;  // A variável que controla a progressão da barra
+        
+                // Função para iniciar a câmera
+                function startCamera() {
+                    if (scanning) return;  // Se já tiver escaneado, não faz nada
+        
+                    scanning = true;  // Marca que começamos a escanear
+                    const video = document.getElementById('video');
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+        
+                    // Acesse a câmera traseira
+                    navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: "environment" } }  // Garante o uso da câmera traseira
+                    })
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.setAttribute('playsinline', true); // Para que funcione no iPhone
+                        video.play();
+                        requestAnimationFrame(scanQRCode); // Inicia o processo de leitura do QR code
+                    })
+                    .catch(err => {
+                        console.error("Erro ao acessar a câmera: ", err);
+                        document.getElementById('log').textContent = "Erro ao acessar a câmera.";
+                    });
+                }
+        
+                // Função para escanear o QR code a cada quadro
+                function scanQRCode() {
+                    if (!scanning) return; // Se já leu o QR code, não faz mais nada
+        
+                    const video = document.getElementById('video');
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+        
+                    // Definir o tamanho do canvas para o tamanho do vídeo
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+        
+                    // Desenhar o vídeo no canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+                    // Obter a imagem do canvas como dados
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, canvas.width, canvas.height);
+        
+                    if (code) {
+                        // QR code foi encontrado
+                        handleQRCode(code);
+                    } else {
+                        // Continua escaneando se não encontrar nenhum QR code
+                        requestAnimationFrame(scanQRCode);
                     }
-                }, 100); // A cada 100ms, verifica se há QR code
-            }
-    
-            // Função para aumentar a barra de progresso
-            function increaseProgress() {
-                if (progress < 105) {
-                    progress += 15; // Aumenta 15% a cada QR code lido
-                    progressBar.style.width = progress + "%";
-                    progressBar.innerText = progress + "%";
                 }
-                if (progress === 105) {
-                    showRedirectButton();
+        
+                // Função para tratar o QR code lido
+                function handleQRCode(code) {
+                    // Exibe o conteúdo do QR code no log
+                    document.getElementById('log').textContent = `QR Code encontrado: ${code.data}`;
+        
+                    // Aumenta a barra de progresso a cada QR code lido
+                    increaseProgress();
+        
+                    // Parar o stream de vídeo e interromper a leitura da câmera
+                    stopCamera();
+        
+                    // Exibir o botão de redirecionamento
+                    document.getElementById('redirect-button').style.display = 'inline-block';
                 }
-            }
-    
-            // Função para mostrar o botão de redirecionamento
-            function showRedirectButton() {
-                redirectButton.style.display = 'inline-block'; // Torna o botão visível
-            }
-    
-            // Função para ler QR code a partir de um arquivo de imagem
-            function readQRCodeFromFile(event) {
-                let file = event.target.files[0];
-                let reader = new FileReader();
-    
-                reader.onload = function(e) {
-                    let img = new Image();
-                    img.onload = function() {
-                        let canvas = document.createElement("canvas");
-                        let context = canvas.getContext("2d");
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        context.drawImage(img, 0, 0, img.width, img.height);
-    
-                        let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        let decoded = jsQR(imageData.data, canvas.width, canvas.height);
-    
-                        if (decoded) {
-                            // Se QR Code for lido, aumente a barra de progresso
-                            increaseProgress();
-    
-                            // Exibe o conteúdo do QR code (opcional)
-                            logMessage(decoded.data);
-                        } else {
-                            alert("QR Code não encontrado na imagem.");
-                        }
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-    
-            // Função para logar a mensagem do QR Code lido
-            function logMessage(message) {
-                let log = document.getElementById("log");
-                log.innerText = "QR Code lido: " + message;
-            }
-        </script>
-    </body>
-
+        
+                // Função para aumentar a barra de progresso
+                function increaseProgress() {
+                    // Aumenta o progresso em 20% por cada QR Code lido (ajuste conforme necessário)
+                    progress += 20;
+                    if (progress > 100) progress = 100; // Limita a 100%
+        
+                    // Atualiza a barra de progresso
+                    const progressBar = document.getElementById('progress-bar');
+                    progressBar.style.width = progress + '%';
+                    progressBar.textContent = progress + '%';
+                }
+        
+                // Função para parar a câmera
+                function stopCamera() {
+                    const video = document.getElementById('video');
+                    const stream = video.srcObject;
+        
+                    // Se o stream da câmera estiver ativo, pare a captura de vídeo
+                    if (stream) {
+                        const tracks = stream.getTracks();
+                        tracks.forEach(track => track.stop());
+                        video.srcObject = null;
+                    }
+        
+                    scanning = false;  // Permitir escaneamento novamente, caso necessário
+                }
+        
+                // Inicia a câmera quando a página carregar
+                window.onload = startCamera;
+            </script>
+        
 </html>
