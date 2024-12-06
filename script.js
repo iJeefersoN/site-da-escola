@@ -18,7 +18,7 @@ function startCamera() {
             requestAnimationFrame(scanQRCode); // Inicia o processo de leitura do QR code
         })
         .catch(err => {
-            console.error("Erro ao acessar a câmera: ", err);
+            console.error("Erro ao acessar a câmera: ", error);
         });
 
     // Função para escanear o QR code a cada quadro
