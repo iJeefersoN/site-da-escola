@@ -18,31 +18,36 @@ function startCamera() {
             requestAnimationFrame(scanQRCode); // Inicia o processo de leitura do QR code
         })
         .catch(err => {
-            console.error("Erro ao acessar a câmera: ", error);
+            console.error("Erro ao acessar a câmera: ", err);
+            document.getElementById('log').textContent = "Erro ao acessar a câmera.";
         });
+}
 
-    // Função para escanear o QR code a cada quadro
-    function scanQRCode() {
-        if (!scanning) return; // Se já leu o QR code, não faz mais nada
+// Função para escanear o QR code a cada quadro
+function scanQRCode() {
+    if (!scanning) return; // Se já leu o QR code, não faz mais nada
 
-        // Definir o tamanho do canvas para o tamanho do vídeo
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+    const video = document.getElementById('video');
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
 
-        // Desenhar o vídeo no canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Definir o tamanho do canvas para o tamanho do vídeo
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-        // Obter a imagem do canvas como dados
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, canvas.width, canvas.height);
+    // Desenhar o vídeo no canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        if (code) {
-            // QR code foi encontrado
-            handleQRCode(code);
-        } else {
-            // Continua escaneando se não encontrar nenhum QR code
-            requestAnimationFrame(scanQRCode);
-        }
+    // Obter a imagem do canvas como dados
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+    if (code) {
+        // QR code foi encontrado
+        handleQRCode(code);
+    } else {
+        // Continua escaneando se não encontrar nenhum QR code
+        requestAnimationFrame(scanQRCode);
     }
 }
 
@@ -103,3 +108,6 @@ function readQRCodeFromFile(event) {
         reader.readAsDataURL(file);
     }
 }
+
+// Inicia a câmera quando a página carregar
+window.onload = startCamera;

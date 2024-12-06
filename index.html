@@ -16,98 +16,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-          /* Reset de margens e padding */
-          * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-         }
-    
-            /* Corpo da página */
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #f7f7f7;
-                color: #333;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                flex-direction: column;
-            }
-    
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 20px;
-                color: #333;
-            }
-    
-            /* Estilos para a barra de progresso */
-            #progress-bar-container {
-                width: 80%;
-                max-width: 600px;
-                background-color: #e0e0e0;
-                border-radius: 15px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                margin: 20px 0;
-            }
-    
-            #progress-bar {
-                height: 30px;
-                width: 0;
-                background-color: #0096ed;
-                border-radius: 15px;
-                text-align: center;
-                line-height: 30px;
-                color: white;
-                font-weight: bold;
-            }
-    
-            /* Estilos para os botões */
-            button, input[type="file"] {
-                background-color: #0096ed;
-                border: none;
-                color: white;
-                padding: 10px 20px;
-                margin: 10px;
-                font-size: 1rem;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-    
-            button:hover, input[type="file"]:hover {
-                background-color: #0096ed;
-            }
-    
-            button:focus, input[type="file"]:focus {
-                outline: none;
-            }
-    
-            /* Estilos para mensagens ou logs */
-            #log {
-                margin-top: 20px;
-                font-size: 1rem;
-                color: #555;
-            }
-    
-            /* Estilo para o botão de redirecionamento */
-            #redirect-button {
-                display: none; /* Esconde o botão inicialmente */
-                background-color: #008CBA;
-                padding: 15px 32px;
-                font-size: 1.2rem;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-    
-            #redirect-button:hover {
-                background-color: #007bb5;
-            }
-        </style>
+   
     </head>
     <body>
     
@@ -180,7 +89,7 @@
                             logMessage(decoded.data);
                         }
                     }
-                }, 500); // A cada 500ms, verifica se há QR code
+                }, 100); // A cada 100ms, verifica se há QR code
             }
     
             // Função para aumentar a barra de progresso
